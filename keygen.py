@@ -1,19 +1,27 @@
-from utils import readArguments
+from utils import readArguments, extractKey
 from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA, ECC
 
 # Parse arguments
 args = readArguments()
 
-privatekey = ''
+privateKey = ''
 publicKey = ''
 if args['t'] == 'rsa':
-    privatekey = RSA.generate(2048)
-    publicKey = privatekey.publickey()
+    privateKey = RSA.generate(2048)
+    publicKey = privateKey.publickey()
 elif args['t'] == 'ec':
-    privatekey = ECC.generate(curve='P-256')
-    publicKey = privatekey.public_key()
+    privateKey = ECC.generate(curve='P-256')
+    publicKey = privateKey.public_key()
 
+pubKeyBytes, privKeyBytes = extractKey(publicKey, privateKey)
 
-print('\nPrivate Key:\n', privatekey.export_key(format='PEM'))
-print('\nPublic Key:\n', publicKey.export_key(format='PEM'))
+print('\nPublic Key:\n', pubKeyBytes)
+print('\nPrivate Key:\n', privKeyBytes)
+
+with open(args['pub'], 'wb') as fout: 
+    fout.write(pubKeyBytes)
+
+with open(args['priv'], 'wb') as fout: 
+    fout.write(privKeyBytes)
+

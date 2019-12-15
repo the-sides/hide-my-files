@@ -21,3 +21,18 @@ def readArguments():
         else:
             cleanargs[arg[0]] = arg[1][0]
     return cleanargs
+
+
+
+def extractKey(publicKey, privateKey):
+    pubString = publicKey.export_key(format='PEM')
+    privString = privateKey.export_key(format='PEM')
+
+    #  Convert to bytes
+    if type(pubString) == str:
+        pubString = str.encode(pubString)
+
+    if type(privString) == str:
+        privString = str.encode(privString)
+
+    return pubString, privString
