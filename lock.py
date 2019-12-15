@@ -1,4 +1,5 @@
 import os
+import ast
 from utils import readArguments
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
@@ -36,9 +37,12 @@ with open('keyfile', 'wb') as fout:
     # fout.write(nonce)
 
 # Encryption Process
-hidden, tag = cipher.encrypt_and_digest(files['secrets/hideThisFile'])
+hidden, tag = cipher.encrypt_and_digest(str(files).encode())
 
 cipherDec = AES.new(key, AES.MODE_GCM, cipher.nonce)
 washed = cipherDec.decrypt_and_verify(hidden, tag)
+washed = washed.decode()
+washed = ast.literal_eval(washed)
+
 
 print(hidden, washed)
