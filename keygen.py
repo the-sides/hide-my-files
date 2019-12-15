@@ -3,7 +3,7 @@ from Crypto.Cipher import AES
 from Crypto.PublicKey import RSA, ECC
 
 # Parse arguments
-args = readArguments()
+args = readArguments('keygen')
 
 privateKey = ''
 publicKey = ''

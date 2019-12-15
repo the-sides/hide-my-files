@@ -2,12 +2,20 @@
 import argparse
 
 # Parse arguments
-def readArguments():
+def readArguments(program):
     parser = argparse.ArgumentParser()
-    parser.add_argument('-t', nargs=1, default=None, help='Key Pair Type')
-    parser.add_argument('-s', nargs=1, default=None, help='Key Pair Subject')
-    parser.add_argument('-pub', nargs=1, default=None, help='Public key output path')
-    parser.add_argument('-priv', nargs=1, default=None, help='Private key output path')
+
+    if program == 'keygen':
+        parser.add_argument('-t', nargs=1, default=None, help='Key Pair Type')
+        parser.add_argument('-s', nargs=1, default=None, help='Key Pair Subject')
+        parser.add_argument('-pub', nargs=1, default=None, help='Public key output path')
+        parser.add_argument('-priv', nargs=1, default=None, help='Private key output path')
+    elif program == 'lock':
+        parser.add_argument('-d', nargs=1, default=None, help='The directory to lock or unlock.')
+        parser.add_argument('-p', nargs=1, default=None, help='Path to public key')
+        parser.add_argument('-r', nargs=1, default=None, help='Path to private key')
+        parser.add_argument('-s', nargs=1, default=None, help='The subject you want to encrypt the directory for or who you expect it from.')
+
 
     args = parser.parse_args()
     cleanargs = {}
