@@ -1,0 +1,1 @@
+python3 keygen.py -t rsa -s certSubject -pub key.pub -priv key

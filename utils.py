@@ -10,6 +10,7 @@ def readArguments():
     parser.add_argument('-priv', nargs=1, default=None, help='Private key output path')
 
     args = parser.parse_args()
+    cleanargs = {}
 
     # Error-check parsed arguments
     for arg in args._get_kwargs():
@@ -17,4 +18,6 @@ def readArguments():
             parser.print_help()
             print("Argument '-{}' is not specified".format(arg[0]))
             exit()
-    return args
+        else:
+            cleanargs[arg[0]] = arg[1][0]
+    return cleanargs
