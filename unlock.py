@@ -1,28 +1,46 @@
 import ast
-from Crypto.Cipher import AES
+from utils import readArguments, decryptFile
+from Crypto.Cipher import AES, PKCS1_OAEP
+from Crypto.PublicKey import RSA, ECC
 
 
+args = readArguments('lock')
+public = ''
+private = ''
+packedFiles = ''
 hiddenKey   = ''
-tag   = ''
-ciphertext = ''
+
+# Read public key for encrypting keyfile
+with open(args['p']) as fin: 
+    public = ECC.import_key(fin.read())
+
+# Read private key for signing keyfile into keyfile.sig
+with open(args['r']) as fin: 
+    private = RSA.import_key(fin.read())
 
 with open('keyfile', 'rb') as fin:
     hiddenKey = fin.read()
 
-key = hiddenKey[0:16]
-nonce = hiddenKey[16:]
+# Decrypt hiddenKey
+rsa_dec = PKCS1_OAEP.new(private)
+hiddenKey = rsa_dec.decrypt(hiddenKey)
 
+key = hiddenKey[0:16]
+iv = hiddenKey[16:]
+print('after  key', key)
+print('after   iv', iv)
+
+exit()
 
 with open('keyfile.sig', 'rb') as fin:
     tag = fin.read()
 
 with open('locked', 'rb') as fin:
-    ciphertext = fin.read()
+    packedFiles = fin.read()
 
-cipher = AES.new(key, AES.MODE_GCM, nonce)
-
-files = cipher.decrypt_and_verify(ciphertext, tag)
-files = files.decode()
-files = ast.literal_eval(files)
+washedFiles = ast.literal_eval(packedFiles.decode())
+for filename in washedFiles:
+    print(filename)
+    revealed = decryptFile(washedFiles[filename][0], washedFiles[filename][1], key, iv)
 
 print(files)
