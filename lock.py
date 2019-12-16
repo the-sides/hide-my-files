@@ -1,6 +1,6 @@
 import os
 import ast
-from utils import readArguments
+from utils import readArguments, encryptFile, decryptFile
 from Crypto.Cipher import AES
 from Crypto.Random import get_random_bytes
 
@@ -26,23 +26,34 @@ for filename in files:
 
 # Encryption Setup
 key    = get_random_bytes(16)
-cipher = AES.new(key, AES.MODE_GCM)
-nonce  = cipher.nonce
+iv     = get_random_bytes(16)
 
 # Keyfile for single party decrypting
-keyfileContent = key + nonce
+keyfileContent = key + iv
 print(key == keyfileContent[0:16])
 with open('keyfile', 'wb') as fout:
     fout.write(keyfileContent)
     # fout.write(nonce)
 
 # Encryption Process
-hidden, tag = cipher.encrypt_and_digest(str(files).encode())
+hidden, tag = encryptFile(files['secrets/hideThisFile'], key, iv)
+# washed = decryptFile(hidden, tag, key, iv)
+# print(washed)
 
-cipherDec = AES.new(key, AES.MODE_GCM, cipher.nonce)
-washed = cipherDec.decrypt_and_verify(hidden, tag)
-washed = washed.decode()
-washed = ast.literal_eval(washed)
+for filename in files:
+    hidden, tag = encryptFile(files[filename], key, iv) 
+    files[filename] = (hidden, tag)
 
+packedFiles = str(files).encode()
+# Send to 'locked' read from unlock.py
+washedFiles = ast.literal_eval(packedFiles.decode())
 
-print(hidden, washed)
+for filename in washedFiles:
+    print(filename)
+    print(decryptFile(washedFiles[filename][0], washedFiles[filename][1], key, iv))
+# print(washedFiles)
+# with open ('locked', 'wb') as fout:
+#     fout.write(hidden)
+
+# with open('keyfile.sig', 'wb') as fout:
+#     fout.write(tag)

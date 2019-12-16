@@ -1,5 +1,5 @@
-
 import argparse
+from Crypto.Cipher import AES
 
 # Parse arguments
 def readArguments(program):
@@ -44,3 +44,13 @@ def extractKey(publicKey, privateKey):
         privString = str.encode(privString)
 
     return pubString, privString
+
+def encryptFile(content, key, iv):
+    cipher = AES.new(key, AES.MODE_GCM, iv)
+    cipherText, tag = cipher.encrypt_and_digest(content)
+    return cipherText, tag
+
+def decryptFile(content, tag, key, iv):
+    cipher = AES.new(key, AES.MODE_GCM, iv)
+    message = cipher.decrypt_and_verify(content, tag)
+    return message
