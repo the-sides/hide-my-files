@@ -30,17 +30,17 @@ iv = hiddenKey[16:]
 print('after  key', key)
 print('after   iv', iv)
 
-exit()
 
-with open('keyfile.sig', 'rb') as fin:
-    tag = fin.read()
+# with open('keyfile.sig', 'rb') as fin:
+#     tag = fin.read()
 
 with open('locked', 'rb') as fin:
     packedFiles = fin.read()
 
-washedFiles = ast.literal_eval(packedFiles.decode())
-for filename in washedFiles:
+files = ast.literal_eval(packedFiles.decode())
+for filename in files:
     print(filename)
-    revealed = decryptFile(washedFiles[filename][0], washedFiles[filename][1], key, iv)
+    revealed = decryptFile(files[filename][0], files[filename][1], key, iv)
+    files[filename] = revealed
 
 print(files)
