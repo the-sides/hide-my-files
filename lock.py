@@ -16,6 +16,9 @@ files = {}
 # Read public key for encrypting keyfile
 with open(args['p']) as fin: 
     subject = fin.readline()[:-1]
+    if subject != args['s']:
+        print('Subject does not match key')
+        exit()
     public = RSA.import_key(fin.read())
 
 # Read private key for signing keyfile into keyfile.sig
@@ -44,10 +47,6 @@ keyfileContent = key + iv
 print(key == keyfileContent[0:16])
 
 # Encryption Process
-hidden, tag = encryptFile(files['secrets/hideThisFile'], key, iv)
-# washed = decryptFile(hidden, tag, key, iv)
-# print(washed)
-
 for filename in files:
     hidden, tag = encryptFile(files[filename], key, iv) 
     files[filename] = (hidden, tag)

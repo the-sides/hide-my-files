@@ -1,4 +1,4 @@
-import ast
+import ast, os
 from utils import readArguments, decryptFile
 from Crypto.Cipher import AES, PKCS1_OAEP
 from Crypto.PublicKey import RSA, ECC
@@ -17,6 +17,9 @@ subject = ''
 # Read public key for encrypting keyfile
 with open(args['p'], 'rb') as fin: 
     subject = fin.readline()[:-1]
+    if subject.decode() != args['s']:
+        print('Subject does not match key', subject, args['s'] )
+        exit()
     public = ECC.import_key(fin.read())
 
 # Read private key for signing keyfile into keyfile.sig
@@ -29,8 +32,9 @@ with open('keyfile', 'rb') as fin:
 with open('keyfile.sig', 'rb') as fin:
     signature = fin.read()
 
-with open('locked', 'rb') as fin:
+with open(args['d'], 'rb') as fin:
     packedFiles = fin.read()
+
 
 # Decrypt hiddenKey
 rsa_dec = PKCS1_OAEP.new(private)
@@ -57,4 +61,16 @@ for filename in files:
     revealed = decryptFile(files[filename][0], files[filename][1], key, iv)
     files[filename] = revealed
 
-print(files)
+for filename in files:
+    dirs = filename.split('/')[:-1]
+    dirs = '/'.join(dirs)
+    try:
+        os.mkdir(dirs)
+        print('created', dirs)
+    except OSError:
+        print (f"directory {dirs} already exists")
+    with open(filename, 'wb') as fout:
+        fout.write(files[filename])
+
+os.remove("keyfile")
+os.remove("keyfile.sig")

@@ -1,7 +1,7 @@
 
 all: 
 	echo Building...
-	# chmod 755 ./rsa-enc
-	# chmod 755 ./rsa-dec
-	# chmod 755 ./rsa-keygen
+	chmod 755 ./lock
+	chmod 755 ./unlock
+	chmod 755 ./keygen
 	pip3 install pycryptodome
