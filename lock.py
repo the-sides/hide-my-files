@@ -3,6 +3,8 @@ import ast
 from utils import readArguments, encryptFile
 from Crypto.PublicKey import RSA, ECC
 from Crypto.Cipher import AES, PKCS1_OAEP
+from Crypto.Hash import SHA256
+from Crypto.Signature import DSS
 from Crypto.Random import get_random_bytes
 
 args = readArguments('lock')
@@ -38,9 +40,6 @@ iv     = get_random_bytes(16)
 # Keyfile for single party decrypting
 keyfileContent = key + iv
 print(key == keyfileContent[0:16])
-with open('keyfile', 'wb') as fout:
-    fout.write(keyfileContent)
-    # fout.write(nonce)
 
 # Encryption Process
 hidden, tag = encryptFile(files['secrets/hideThisFile'], key, iv)
@@ -66,23 +65,19 @@ with open ('locked', 'wb') as fout:
 # Create keyfile with key and iv
 # Encrypt using RSA pub
 rsa_enc = PKCS1_OAEP.new(public)
-print('before key', key)
-print('before  iv', iv)
 secretKey = rsa_enc.encrypt(keyfileContent)
 with open('keyfile', 'wb') as fout:
     fout.write(secretKey)
 
-# rsa_dec = PKCS1_OAEP.new(private)
-# washed = rsa_dec.decrypt(secretKey)
-# print('after ', washed)
-
 # Sign keyfile with ECC priv, write to keyfile.sig
-
-##########    Done by unlock.py   ###########
-# Decrypt using RSA priv
-# Verify keyfile.sig with ECC pub
-############################################
-
-
+signer = DSS.new(private, 'fips-186-3')
+hashOfKey = SHA256.new(secretKey)
+signature = signer.sign(hashOfKey)
 with open('keyfile.sig', 'wb') as fout:
-    fout.write(tag)
+    fout.write(signature)
+
+##########    Done by unlock.py   ############
+# Decrypt using RSA priv
+# Verify keyfile with ECC pub and keyfile.sig
+##############################################
+
