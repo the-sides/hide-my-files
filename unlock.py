@@ -12,9 +12,11 @@ private = ''
 packedFiles = ''
 hiddenKey   = ''
 signature = ''
+subject = ''
 
 # Read public key for encrypting keyfile
 with open(args['p'], 'rb') as fin: 
+    subject = fin.readline()[:-1]
     public = ECC.import_key(fin.read())
 
 # Read private key for signing keyfile into keyfile.sig

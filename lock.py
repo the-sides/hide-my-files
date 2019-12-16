@@ -10,10 +10,12 @@ from Crypto.Random import get_random_bytes
 args = readArguments('lock')
 public = ''
 private = ''
+subject = ''
 files = {}
 
 # Read public key for encrypting keyfile
 with open(args['p']) as fin: 
+    subject = fin.readline()[:-1]
     public = RSA.import_key(fin.read())
 
 # Read private key for signing keyfile into keyfile.sig

@@ -32,7 +32,7 @@ def readArguments(program):
 
 
 
-def extractKey(publicKey, privateKey):
+def extractKey(publicKey, privateKey, subject):
     pubString = publicKey.export_key(format='PEM')
     privString = privateKey.export_key(format='PEM')
 
@@ -42,6 +42,10 @@ def extractKey(publicKey, privateKey):
 
     if type(privString) == str:
         privString = str.encode(privString)
+        
+    # Attach subject line
+    subject = str.encode(subject+'\n')
+    pubString = subject + pubString
 
     return pubString, privString
 

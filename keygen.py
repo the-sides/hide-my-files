@@ -14,7 +14,7 @@ elif args['t'] == 'ec':
     privateKey = ECC.generate(curve='P-256')
     publicKey = privateKey.public_key()
 
-pubKeyBytes, privKeyBytes = extractKey(publicKey, privateKey)
+pubKeyBytes, privKeyBytes = extractKey(publicKey, privateKey, args['s'])
 
 print('\nPublic Key:\n', pubKeyBytes)
 print('\nPrivate Key:\n', privKeyBytes)
